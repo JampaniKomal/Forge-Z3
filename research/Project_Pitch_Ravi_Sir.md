@@ -35,15 +35,15 @@ The project functions as an Infrastructure Compiler operating in three distinct 
 This project builds upon recent state-of-the-art research in automated security modeling and formal verification:
 
 1. **Automated Vulnerability Modeling:**
-   - *Ou, X., Boyer, W. F., & McQueen, M. A. (2006). "A scalable approach to attack graph generation." (MulVAL)* 
+   - *Ou, X., Boyer, W. F., & McQueen, M. A. (2006). ["A scalable approach to attack graph generation." (MulVAL)](https://dl.acm.org/doi/10.1145/1102120.1102124)* 
      - **Application:** Forge-Z3 adapts MulVAL’s Datalog approach to define the logical preconditions of vulnerabilities.
 2. **Neuro-Symbolic Verification (2025-2026):**
-   - *"ProofNet++: A Neuro-Symbolic System for Formal Proof Verification with Self-Correction" (arXiv:2505.13840)*
+   - *["ProofNet++: A Neuro-Symbolic System for Formal Proof Verification with Self-Correction"](https://arxiv.org/abs/2505.13840)*
      - **Application:** Demonstrates the efficacy of using LLMs in a loop with formal provers to iteratively correct logical errors.
-   - *"FormalJudge: A Neuro-Symbolic Paradigm for Agentic Oversight" (arXiv:2602.05432)*
+   - *["FormalJudge: A Neuro-Symbolic Paradigm for Agentic Oversight"](https://arxiv.org/abs/2602.05432)*
      - **Application:** Validates the use of Z3 SMT solvers to provide deterministic proofs over AI-generated outputs, preventing hallucinations in security contexts.
 3. **Infrastructure Automation:**
-   - *SecGen: Security Scenario Generator (GitHub/SecGen)*
+   - *[SecGen: Security Scenario Generator](https://github.com/SecGen/SecGen)*
      - **Application:** Forge-Z3 acts as the intelligent front-end compiler, passing verified topologies to SecGen for physical VM provisioning.
 
 ## 5. Minimum Viable Product (MVP)
