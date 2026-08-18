@@ -1,0 +1,112 @@
+{
+  "cves": [
+    {
+      "cve_id": "CVE-2021-44228",
+      "description": "Log4Shell - Unauthenticated RCE in log4j",
+      "software_target": "Apache Tomcat",
+      "port": 8080,
+      "exploit_type": "RCE",
+      "pre_privilege": "NETWORK_ACCESS",
+      "post_privilege": "ROOT"
+    },
+    {
+      "cve_id": "CVE-2017-5638",
+      "description": "Apache Struts 2 RCE",
+      "software_target": "Apache Struts",
+      "port": 8080,
+      "exploit_type": "RCE",
+      "pre_privilege": "NETWORK_ACCESS",
+      "post_privilege": "USER"
+    },
+    {
+      "cve_id": "CVE-2019-19781",
+      "description": "Citrix ADC Directory Traversal to RCE",
+      "software_target": "Citrix ADC",
+      "port": 443,
+      "exploit_type": "RCE",
+      "pre_privilege": "NETWORK_ACCESS",
+      "post_privilege": "ROOT"
+    },
+    {
+      "cve_id": "CVE-2021-26855",
+      "description": "ProxyLogon - MS Exchange Server SSRF to RCE",
+      "software_target": "Microsoft Exchange",
+      "port": 443,
+      "exploit_type": "RCE",
+      "pre_privilege": "NETWORK_ACCESS",
+      "post_privilege": "ROOT"
+    },
+    {
+      "cve_id": "CVE-2021-3156",
+      "description": "Sudo Baron Samedit - Heap-Based Buffer Overflow",
+      "software_target": "sudo",
+      "port": 0,
+      "exploit_type": "PRIVILEGE_ESCALATION",
+      "pre_privilege": "USER",
+      "post_privilege": "ROOT"
+    },
+    {
+      "cve_id": "CVE-2021-4034",
+      "description": "PwnKit - polkit pkexec local privilege escalation",
+      "software_target": "polkit",
+      "port": 0,
+      "exploit_type": "PRIVILEGE_ESCALATION",
+      "pre_privilege": "USER",
+      "post_privilege": "ROOT"
+    },
+    {
+      "cve_id": "CVE-2016-5195",
+      "description": "Dirty COW - Linux kernel privilege escalation",
+      "software_target": "Linux Kernel",
+      "port": 0,
+      "exploit_type": "PRIVILEGE_ESCALATION",
+      "pre_privilege": "USER",
+      "post_privilege": "ROOT"
+    },
+    {
+      "cve_id": "CVE-2017-0144",
+      "description": "EternalBlue - SMBv1 RCE",
+      "software_target": "Windows SMB",
+      "port": 445,
+      "exploit_type": "RCE",
+      "pre_privilege": "NETWORK_ACCESS",
+      "post_privilege": "ROOT"
+    },
+    {
+      "cve_id": "CVE-2020-1472",
+      "description": "ZeroLogon - Netlogon Elevation of Privilege",
+      "software_target": "Windows Domain Controller",
+      "port": 135,
+      "exploit_type": "RCE",
+      "pre_privilege": "NETWORK_ACCESS",
+      "post_privilege": "ROOT"
+    },
+    {
+      "cve_id": "CVE-2014-0160",
+      "description": "Heartbleed - OpenSSL Information Disclosure",
+      "software_target": "OpenSSL",
+      "port": 443,
+      "exploit_type": "INFO_DISCLOSURE",
+      "pre_privilege": "NETWORK_ACCESS",
+      "post_privilege": "USER"
+    },
+    {
+      "cve_id": "CVE-2019-0708",
+      "description": "BlueKeep - Remote Desktop Services RCE",
+      "software_target": "Windows RDP",
+      "port": 3389,
+      "exploit_type": "RCE",
+      "pre_privilege": "NETWORK_ACCESS",
+      "post_privilege": "ROOT"
+    },
+    {
+      "cve_id": "WEAK_SSH_CREDS",
+      "description": "Intentional misconfiguration allowing SSH brute force",
+      "software_target": "OpenSSH",
+      "port": 22,
+      "exploit_type": "AUTHENTICATION_BYPASS",
+      "pre_privilege": "NETWORK_ACCESS",
+      "post_privilege": "USER"
+    }
+  ]
+}

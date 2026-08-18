@@ -31,11 +31,16 @@
 - Use `fp.fact(Edge(val1, val2))` syntax, NOT `fp.fact(Edge, val1, val2)`.
 - The Fixedpoint engine requires `BitVecSort`, not `DeclareSort`.
 
-#### Next Up: Phase 1 — CVE Knowledge Base
-- [ ] Design the Pydantic schema for CVE entries
-- [ ] Hand-code 12-15 CVEs into `src/knowledge_base/cve_database.json`
-- [ ] Write MulVAL-inspired interaction rules
-- [ ] Unit tests for schema validation
+#### Phase 1: CVE Knowledge Base
+- [x] Design the Pydantic schema for CVE entries (`src/knowledge_base/schema.py`)
+- [x] Hand-code 12 CVEs into `src/knowledge_base/cve_database.json`
+- [x] Write MulVAL-inspired interaction rules (`src/knowledge_base/physics.py`)
+- [x] Unit tests for schema validation (`tests/test_knowledge_base.py` - PASSED)
+
+#### Next Up: Phase 2 — Datalog Engine (The Mathematical Core)
+- [ ] Write `src/datalog/translator.py` to convert JSON topologies into Z3 Datalog facts
+- [ ] Integrate the CVE knowledge base rules into the Z3 Fixedpoint engine
+- [ ] Create unit tests proving that Z3 can find attack paths across multiple nodes
 
 ---
 
