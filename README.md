@@ -13,7 +13,7 @@ Instead of relying purely on the probabilistic output of Large Language Models (
 3. **Self-Healing Loop:** If Z3 detects a structural hallucination (`UNSAT`), it automatically extracts the failure reason and prompts the LLM to self-correct.
 4. **Compilation:** Once mathematically proven, the engine compiles the network into a bootable `Vagrantfile` and Ansible Playbooks.
 
-*Built by Jampani Komal at Rashtriya Raksha University (RRU).*
+*Built by Jampani Komal at Rashtriya Raksha University (RRU) in collaboration with Antigravity AI.*
 
 ---
 
