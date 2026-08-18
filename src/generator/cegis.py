@@ -7,6 +7,7 @@ a mathematically sound attack path.
 """
 
 from rich.console import Console
+
 from src.generator.llm_client import LLMGenerator
 from src.z3_engine.engine import Z3Engine
 from src.z3_engine.schema import Topology
@@ -24,21 +25,21 @@ class CEGISLoop:
         Loops until Z3 returns SAT, or max_iterations is reached.
         """
         previous_failures = []
-        
+
         for iteration in range(1, self.max_iterations + 1):
             console.print(f"\n[bold cyan]CEGIS Iteration {iteration}/{self.max_iterations}[/bold cyan]")
-            
+
             try:
                 # 1. SYNTHESIS (Neural)
                 with console.status("[yellow]LLM generating topology...[/yellow]"):
                     topology = self.generator.generate_topology(user_prompt, previous_failures)
                 console.print("  [green]✓ LLM generated a schema-compliant topology.[/green]")
-                
+
                 # 2. VERIFICATION (Symbolic)
                 with console.status("[blue]Z3 verifying attack path physics...[/blue]"):
                     engine = Z3Engine(topology)
                     is_sat = engine.verify_attack_path(target_node_id)
-                
+
                 if is_sat:
                     console.print("  [bold green]✓ Z3 VERIFIED (SAT): The attack path is mathematically valid![/bold green]")
                     return topology
@@ -50,9 +51,9 @@ class CEGISLoop:
                         "your NetworkEdges and pre_privileges."
                     )
                     previous_failures.append(failure_msg)
-            
+
             except Exception as e:
                 console.print(f"  [bold red]✗ LLM Generation Error:[/bold red] {str(e)}")
                 previous_failures.append(str(e))
-                
+
         raise RuntimeError("CEGIS loop exhausted max iterations without finding a valid topology.")

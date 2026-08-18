@@ -1,8 +1,11 @@
 import os
 import shutil
+
 import pytest
-from src.z3_engine.schema import Topology, Node, Edge, VulnerabilityInstance
+
 from src.visualization.graph import TopologyVisualizer
+from src.z3_engine.schema import Edge, Node, Topology, VulnerabilityInstance
+
 
 @pytest.fixture
 def temp_build_dir(tmpdir):
@@ -24,13 +27,13 @@ def test_visualizer_generates_html(temp_build_dir):
             VulnerabilityInstance(node_id=1, cve_id="CVE-2021-44228"),
         ]
     )
-    
+
     visualizer = TopologyVisualizer(build_dir=temp_build_dir)
     html_path = visualizer.generate_html(topology, filename="test_topo.html")
-    
+
     assert os.path.exists(html_path)
-    
-    with open(html_path, "r", encoding="utf-8") as f:
+
+    with open(html_path, encoding="utf-8") as f:
         content = f.read()
         assert "Web Server" in content
         assert "Attacker" in content

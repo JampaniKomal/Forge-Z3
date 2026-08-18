@@ -1,8 +1,11 @@
 import os
 import shutil
+
 import pytest
-from src.z3_engine.schema import Topology, Node, Edge, VulnerabilityInstance
+
 from src.compiler.generator import IaCCompiler
+from src.z3_engine.schema import Edge, Node, Topology, VulnerabilityInstance
+
 
 @pytest.fixture
 def temp_build_dir(tmpdir):
@@ -27,24 +30,24 @@ def test_compiler_generates_files(temp_build_dir):
             VulnerabilityInstance(node_id=2, cve_id="CVE-2016-5195")
         ]
     )
-    
+
     compiler = IaCCompiler(build_dir=temp_build_dir)
     compiler.compile(topology)
-    
+
     # Assert files exist
     assert os.path.exists(os.path.join(temp_build_dir, "Vagrantfile"))
     assert os.path.exists(os.path.join(temp_build_dir, "inventory.ini"))
     assert os.path.exists(os.path.join(temp_build_dir, "site.yml"))
-    
+
     # Assert Vagrantfile contents
-    with open(os.path.join(temp_build_dir, "Vagrantfile"), "r") as f:
+    with open(os.path.join(temp_build_dir, "Vagrantfile")) as f:
         vagrant_code = f.read()
         assert "config.vm.define 'web_server'" in vagrant_code
         assert "config.vm.define 'database'" in vagrant_code
         assert "Attacker" not in vagrant_code  # Node 0 is skipped
-        
+
     # Assert Ansible playbook contents
-    with open(os.path.join(temp_build_dir, "site.yml"), "r") as f:
+    with open(os.path.join(temp_build_dir, "site.yml")) as f:
         site_code = f.read()
         assert "hosts: web_server" in site_code
         assert "cve_2021_44228" in site_code
