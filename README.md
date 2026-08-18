@@ -8,12 +8,17 @@ Forge-Z3 is a state-of-the-art Infrastructure Compiler that utilizes **Neuro-Sym
 
 Instead of relying purely on the probabilistic output of Large Language Models (which frequently hallucinate physically impossible network topologies), Forge-Z3 utilizes **Counterexample-Guided Inductive Synthesis (CEGIS)**:
 
-1. **Neural Generation:** An LLM generates a JSON topology based on a natural language specification.
-2. **Symbolic Verification:** Microsoft's Z3 SMT Solver mathematically proves whether the attack path is physically possible using a Datalog engine.
+1. **Neural Generation:** Uses LiteLLM (Gemini, Groq, Ollama) and constrained decoding (Pydantic) to generate a JSON network graph based on a natural language prompt.
+2. **Symbolic Translation:** The JSON graph is compiled into formal Datalog predicates.
 3. **Self-Healing Loop:** If Z3 detects a structural hallucination (`UNSAT`), it automatically extracts the failure reason and prompts the LLM to self-correct.
 4. **Compilation:** Once mathematically proven, the engine compiles the network into a bootable `Vagrantfile` and Ansible Playbooks.
 
 *Built by Jampani Komal at Rashtriya Raksha University (RRU) in collaboration with Antigravity AI.*
+
+---
+
+## Example Prompts & Testing
+For a curated list of Easy, Medium, and Hard prompts to test the Z3 engine, see the [Example Prompts Guide](docs/PROMPTS.md).
 
 ---
 
