@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-z3"
+version = "0.1.0"
+description = "A Neuro-Symbolic Cyber Range Compiler"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Jampani Komal"},
+]
+keywords = ["cybersecurity", "cyber-range", "z3", "smt", "neuro-symbolic", "formal-verification"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "z3-solver>=4.12.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "bandit>=1.7.0",
+    "ruff>=0.5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/JampaniKomal/Forge-Z3"
+Repository = "https://github.com/JampaniKomal/Forge-Z3"
+Issues = "https://github.com/JampaniKomal/Forge-Z3/issues"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "S",    # bandit (security)
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "T20",  # flake8-print (catches stray print statements)
+]
+ignore = [
+    "T201",  # allow print() in CLI scripts
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]  # allow assert in tests
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.bandit]
+exclude_dirs = ["tests", "venv"]
+skips = ["B101"]  # skip assert warnings (used in tests)
