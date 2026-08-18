@@ -14,13 +14,28 @@
 ### Work Done
 
 #### Phase 0: Environment Setup
-- [ ] Python virtual environment created
-- [ ] `requirements.txt` with z3-solver, pydantic, etc.
-- [ ] Z3 hello-world script verifying solver works
-- [ ] Project directory structure established
-- [ ] README.md created
-- [ ] `.agents/rules/` created for Antigravity auto-discovery
-- [ ] `devlog/DEVLOG.md` created (this file)
+- [x] Python virtual environment created (`venv/`)
+- [x] `requirements.txt` with z3-solver, pydantic, rich, pytest, bandit, ruff
+- [x] Z3 hello-world script verifying solver works (SAT + UNSAT both pass)
+- [x] Project directory structure established (`src/`, `tests/`, `context/`, `devlog/`, `research/`)
+- [x] README.md created
+- [x] `.agents/rules/` created for Antigravity auto-discovery
+- [x] `devlog/DEVLOG.md` created (this file)
+- [x] Open-source standards: LICENSE (MIT), CONTRIBUTING.md, SECURITY.md
+- [x] Secure coding: pyproject.toml with bandit + ruff (S rules) configured
+- [x] `.gitignore` configured
+
+#### Key Learning: Z3 Datalog API
+- Use `z3.Var(index, sort)` for bound variables in Datalog rules, NOT `z3.BitVec()`.
+- Use `z3.BitVecVal(value, bits)` for concrete node constants in facts.
+- Use `fp.fact(Edge(val1, val2))` syntax, NOT `fp.fact(Edge, val1, val2)`.
+- The Fixedpoint engine requires `BitVecSort`, not `DeclareSort`.
+
+#### Next Up: Phase 1 — CVE Knowledge Base
+- [ ] Design the Pydantic schema for CVE entries
+- [ ] Hand-code 12-15 CVEs into `src/knowledge_base/cve_database.json`
+- [ ] Write MulVAL-inspired interaction rules
+- [ ] Unit tests for schema validation
 
 ---
 
