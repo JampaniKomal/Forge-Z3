@@ -18,7 +18,7 @@ console = Console()
 def main():
     parser = argparse.ArgumentParser(description="Forge-Z3: AI-Driven Cyber Range Compiler")
     parser.add_argument("prompt", type=str, help="The natural language description of the attack path you want.")
-    parser.add_argument("--model", type=str, default="gemini/gemini-2.5-pro", help="The LiteLLM model string to use.")
+    parser.add_argument("--model", type=str, default="gemini/gemini-flash-latest", help="The LiteLLM model string to use.")
     parser.add_argument("--target", type=int, default=2, help="The Node ID of the final target (default: 2).")
 
     args = parser.parse_args()

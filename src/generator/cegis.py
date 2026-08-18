@@ -33,7 +33,7 @@ class CEGISLoop:
                 # 1. SYNTHESIS (Neural)
                 with console.status("[yellow]LLM generating topology...[/yellow]"):
                     topology = self.generator.generate_topology(user_prompt, previous_failures)
-                console.print("  [green]✓ LLM generated a schema-compliant topology.[/green]")
+                console.print("  [green][OK] LLM generated a schema-compliant topology.[/green]")
 
                 # 2. VERIFICATION (Symbolic)
                 with console.status("[blue]Z3 verifying attack path physics...[/blue]"):
@@ -41,10 +41,10 @@ class CEGISLoop:
                     is_sat = engine.verify_attack_path(target_node_id)
 
                 if is_sat:
-                    console.print("  [bold green]✓ Z3 VERIFIED (SAT): The attack path is mathematically valid![/bold green]")
+                    console.print("  [bold green][OK] Z3 VERIFIED (SAT): The attack path is mathematically valid![/bold green]")
                     return topology
                 else:
-                    console.print("  [bold red]✗ Z3 FAILED (UNSAT): The attack path is broken.[/bold red]")
+                    console.print("  [bold red][FAIL] Z3 FAILED (UNSAT): The attack path is broken.[/bold red]")
                     failure_msg = (
                         "Z3 SMT Solver returned UNSAT. The attacker cannot reach the target "
                         "or lacks required privileges to execute the CVEs. Please double-check "
@@ -53,7 +53,7 @@ class CEGISLoop:
                     previous_failures.append(failure_msg)
 
             except Exception as e:
-                console.print(f"  [bold red]✗ LLM Generation Error:[/bold red] {str(e)}")
+                console.print(f"  [bold red][FAIL] LLM Generation Error:[/bold red] {str(e)}")
                 previous_failures.append(str(e))
 
         raise RuntimeError("CEGIS loop exhausted max iterations without finding a valid topology.")

@@ -53,6 +53,7 @@ class LLMGenerator:
             error_msg += "Please fix these logical/physical errors in your next JSON output."
             messages.append({"role": "user", "content": error_msg})
 
+        import os
         response = litellm.completion(
             model=self.model_name,
             messages=messages,
