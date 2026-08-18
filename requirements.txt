@@ -15,7 +15,7 @@ pytest-mock>=3.14.0
 bandit>=1.7.0
 ruff>=0.5.0
 
-# Visualization (Phase 6)
-# networkx>=3.0
-# pyvis>=0.3.0
+# Visualization (Phase 5)
+networkx>=3.0
+pyvis>=0.3.0
 

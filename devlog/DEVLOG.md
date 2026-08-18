@@ -55,10 +55,15 @@
 - [x] Create Ansible playbooks structure targeting the vulnerable VMs
 - [x] Run end-to-end unit test to verify generated IaC code
 
-#### Next Up: Phase 5 — Visualizing the Cyber Range
-- [ ] Add `networkx` and `pyvis` to `requirements.txt`
-- [ ] Build `src/visualization/graph.py` to plot the generated Topology
-- [ ] Export the graph as an interactive HTML file
+#### Phase 5: Visualizing the Cyber Range
+- [x] Add `networkx` and `pyvis` to `requirements.txt`
+- [x] Build `src/visualization/graph.py` to plot the generated Topology
+- [x] Export the graph as an interactive HTML file
+
+#### Next Up: Phase 6 — Final Polish & Pitch Readiness
+- [ ] Ensure all 100% of code has test coverage
+- [ ] Create example `docs/` or high-level diagram
+- [ ] Prepare pitch talking points for Dr. Ravi Sheth
 
 ---
 

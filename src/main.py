@@ -48,10 +48,16 @@ def main():
             border_style="green"
         ))
         
+        # Phase 5: Visualization
+        from src.visualization.graph import TopologyVisualizer
+        visualizer = TopologyVisualizer(build_dir="build")
+        html_path = visualizer.generate_html(valid_topology)
+        
         console.print("[bold yellow]Infrastructure Code Generated in ./build/[/bold yellow]")
         console.print("- Vagrantfile")
         console.print("- site.yml")
         console.print("- inventory.ini")
+        console.print(f"- [bold cyan]Interactive Graph:[/bold cyan] {html_path}")
         
     except Exception as e:
         console.print(f"\n[bold red]Compilation Failed:[/bold red] {str(e)}")
