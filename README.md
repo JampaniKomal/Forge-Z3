@@ -22,8 +22,6 @@ For a complete technical breakdown of the compiler's Datalog layers and CEGIS fe
 
 For a complete breakdown of every file and folder in this repository, see the [Repository Map](docs/REPOSITORY_MAP.md).
 
-If you are preparing for an academic presentation or viva, read the [Academic & Defense FAQ](docs/ACADEMIC_FAQ.md) (covers ML fine-tuning vs CEGIS, HuggingFace support, etc).
-
 This project adapts state-of-the-art research in automated security modeling and neuro-symbolic verification:
 1. **Automated Vulnerability Modeling:** Adapts the Datalog approach from *"A scalable approach to attack graph generation (MulVAL)"* (Ou, Boyer, McQueen).
 2. **Neuro-Symbolic Agentic Oversight:** Inspired by *"FormalJudge: A Neuro-Symbolic Paradigm for Agentic Oversight"* (ICML 2026), replacing standard LLM evaluation with deterministic Dafny/Z3 verification.
