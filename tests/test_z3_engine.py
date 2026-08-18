@@ -1,6 +1,6 @@
-import pytest
-from src.z3_engine.schema import Topology, Node, Edge, VulnerabilityInstance
 from src.z3_engine.engine import Z3Engine
+from src.z3_engine.schema import Edge, Node, Topology, VulnerabilityInstance
+
 
 def test_successful_attack_path():
     """
@@ -25,9 +25,9 @@ def test_successful_attack_path():
             VulnerabilityInstance(node_id=2, cve_id="CVE-2016-5195")   # Dirty COW (local esc)
         ]
     )
-    
+
     engine = Z3Engine(topology)
-    
+
     # Should be SAT (Attacker can get root on DB)
     assert engine.verify_attack_path(target_node_id=2) is True
 
@@ -53,9 +53,9 @@ def test_failed_attack_path_missing_edge():
             VulnerabilityInstance(node_id=2, cve_id="CVE-2016-5195")
         ]
     )
-    
+
     engine = Z3Engine(topology)
-    
+
     # Should be UNSAT (Attacker is stuck at WebServer)
     assert engine.verify_attack_path(target_node_id=2) is False
 
@@ -81,8 +81,8 @@ def test_failed_attack_path_missing_privilege():
             # MISSING LOCAL ESCALATION: Attacker gets USER via SSH, but cannot get ROOT
         ]
     )
-    
+
     engine = Z3Engine(topology)
-    
+
     # Should be UNSAT (Attacker only gets USER, not ROOT)
     assert engine.verify_attack_path(target_node_id=2) is False

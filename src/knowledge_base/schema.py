@@ -6,7 +6,6 @@ to be reasoned about by the Z3 SMT solver.
 """
 
 from enum import Enum
-from typing import List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -38,16 +37,19 @@ class CVEDefinition(BaseModel):
     cve_id: str = Field(..., description="The unique CVE identifier (or WEAK_CREDS)")
     description: str = Field(..., description="Brief description of the vulnerability")
     software_target: str = Field(..., description="The service or software affected")
-    port: int = Field(..., description="The default network port this service runs on", ge=0, le=65535)
-    
+    port: int = Field(
+        ..., description="The default network port this service runs on",
+        ge=0, le=65535,
+    )
+
     exploit_type: ExploitType
-    
+
     pre_privilege: PrivilegeLevel = Field(
-        ..., 
+        ...,
         description="The minimum privilege required *before* the exploit can be triggered."
     )
     post_privilege: PrivilegeLevel = Field(
-        ..., 
+        ...,
         description="The privilege gained *after* successful exploitation."
     )
 
@@ -60,21 +62,29 @@ class CVEDefinition(BaseModel):
             # We enforce that ROOT cannot be a pre-privilege (no point escalating from ROOT)
             if pre == PrivilegeLevel.ROOT:
                 raise ValueError(f"pre_privilege cannot be ROOT for {info.data.get('cve_id')}")
-            
-            # If pre == post, it must be something like Lateral Movement (e.g. Network -> Network on a new host)
-            # For a single host, it usually implies Info Disclosure. We allow it, but flag it as suspicious if it's supposed to be RCE.
-            if pre == post and info.data.get("exploit_type") in [ExploitType.RCE, ExploitType.PRIVILEGE_ESCALATION]:
-                raise ValueError(f"RCE/PrivEsc must result in higher privilege for {info.data.get('cve_id')}")
+
+            # If pre == post, it must be Lateral Movement
+            # (e.g. Network -> Network on a new host).
+            # For a single host, it implies Info Disclosure.
+            escalation_types = [
+                ExploitType.RCE,
+                ExploitType.PRIVILEGE_ESCALATION,
+            ]
+            if pre == post and info.data.get("exploit_type") in escalation_types:
+                cve = info.data.get('cve_id')
+                raise ValueError(
+                    f"RCE/PrivEsc must escalate privilege for {cve}"
+                )
         return post
 
 
 class KnowledgeBase(BaseModel):
     """The root schema for the cve_database.json file."""
-    cves: List[CVEDefinition]
+    cves: list[CVEDefinition]
 
     @field_validator("cves")
     @classmethod
-    def check_unique_cves(cls, cves: List[CVEDefinition]) -> List[CVEDefinition]:
+    def check_unique_cves(cls, cves: list[CVEDefinition]) -> list[CVEDefinition]:
         """Ensure there are no duplicate CVE IDs in the database."""
         seen = set()
         for cve in cves:

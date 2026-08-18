@@ -17,12 +17,10 @@ Basic rules:
         RunsCVE(Target, Port, "CVE-2021-44228").
 """
 
-from typing import Dict, List
 import json
 import os
 
-from pydantic import ValidationError
-from .schema import KnowledgeBase, CVEDefinition
+from .schema import CVEDefinition, KnowledgeBase
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "cve_database.json")
 
@@ -30,13 +28,13 @@ def load_knowledge_base(path: str = DB_PATH) -> KnowledgeBase:
     """
     Loads and validates the CVE database from JSON into Pydantic models.
     """
-    with open(path, "r") as f:
+    with open(path) as f:
         data = json.load(f)
-    
+
     # Validates against the strict Pydantic rules
     return KnowledgeBase(**data)
 
-def get_cve_map() -> Dict[str, CVEDefinition]:
+def get_cve_map() -> dict[str, CVEDefinition]:
     """Returns a dictionary mapping CVE IDs to their Pydantic definitions."""
     kb = load_knowledge_base()
     return {cve.cve_id: cve for cve in kb.cves}

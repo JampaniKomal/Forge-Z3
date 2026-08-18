@@ -4,8 +4,9 @@ This represents the output from the LLM (in JSON mode) and serves as the
 input to the Z3 Mathematical Engine.
 """
 
-from typing import List
+
 from pydantic import BaseModel, Field
+
 
 class Node(BaseModel):
     """A virtual machine in the cyber range."""
@@ -25,6 +26,6 @@ class VulnerabilityInstance(BaseModel):
 
 class Topology(BaseModel):
     """The complete definition of a Cyber Range environment."""
-    nodes: List[Node]
-    edges: List[Edge]
-    vulnerabilities: List[VulnerabilityInstance]
+    nodes: list[Node]
+    edges: list[Edge]
+    vulnerabilities: list[VulnerabilityInstance]

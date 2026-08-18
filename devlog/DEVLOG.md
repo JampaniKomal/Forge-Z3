@@ -43,11 +43,17 @@
 - [x] Integrate the CVE knowledge base rules into the Z3 Fixedpoint engine
 - [x] Create unit tests proving that Z3 can find attack paths across multiple nodes (`tests/test_z3_engine.py` - PASSED)
 
-#### Next Up: Phase 3 — Neural Generator & CEGIS Loop
-- [ ] Connect to Gemini/Groq API for LLM generation
-- [ ] Write the prompt constraints enforcing JSON schema output
-- [ ] Implement the CEGIS loop: if Z3 says UNSAT, extract `unsat_core` and ask LLM to fix it
-- [ ] Build the Rich CLI to tie the Neural and Symbolic layers together
+#### Phase 3: Neural Generator & CEGIS Loop
+- [x] Connect to Gemini/Groq API for LLM generation (`src/generator/llm_client.py`)
+- [x] Write the prompt constraints enforcing JSON schema output
+- [x] Implement the CEGIS loop: if Z3 says UNSAT, ask LLM to fix it (`src/generator/cegis.py`)
+- [x] Build the Rich CLI to tie the Neural and Symbolic layers together (`src/main.py`)
+
+#### Next Up: Phase 4 — IaC Compilation (Terraform/Vagrant)
+- [ ] Write `src/compiler/terraform.py` to translate Topologies into `.tf` files
+- [ ] Pre-configure VM templates (using Ubuntu 20.04/22.04 base boxes)
+- [ ] Create Ansible playbooks/bash scripts to intentionally install the vulnerable software
+- [ ] Run end-to-end test on dummy topology
 
 ---
 
