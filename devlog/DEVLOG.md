@@ -37,10 +37,17 @@
 - [x] Write MulVAL-inspired interaction rules (`src/knowledge_base/physics.py`)
 - [x] Unit tests for schema validation (`tests/test_knowledge_base.py` - PASSED)
 
-#### Next Up: Phase 2 — Datalog Engine (The Mathematical Core)
-- [ ] Write `src/datalog/translator.py` to convert JSON topologies into Z3 Datalog facts
-- [ ] Integrate the CVE knowledge base rules into the Z3 Fixedpoint engine
-- [ ] Create unit tests proving that Z3 can find attack paths across multiple nodes
+#### Phase 2: Datalog Engine (The Mathematical Core)
+- [x] Write `src/z3_engine/schema.py` to define the Topology input schema
+- [x] Write `src/z3_engine/engine.py` to translate Topologies into Z3 Datalog facts
+- [x] Integrate the CVE knowledge base rules into the Z3 Fixedpoint engine
+- [x] Create unit tests proving that Z3 can find attack paths across multiple nodes (`tests/test_z3_engine.py` - PASSED)
+
+#### Next Up: Phase 3 — Neural Generator & CEGIS Loop
+- [ ] Connect to Gemini/Groq API for LLM generation
+- [ ] Write the prompt constraints enforcing JSON schema output
+- [ ] Implement the CEGIS loop: if Z3 says UNSAT, extract `unsat_core` and ask LLM to fix it
+- [ ] Build the Rich CLI to tie the Neural and Symbolic layers together
 
 ---
 
