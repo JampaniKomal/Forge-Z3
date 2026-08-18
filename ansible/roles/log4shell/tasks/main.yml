@@ -1,0 +1,5 @@
+---
+# Dummy task for CVE-2021-44228 (Log4Shell)
+- name: Placeholder for Log4Shell Vulnerability Installation
+  debug:
+    msg: "In a real cyber range, this would install a vulnerable version of Apache Log4j."

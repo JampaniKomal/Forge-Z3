@@ -36,11 +36,22 @@ def main():
         valid_topology = loop.synthesize(args.prompt, target_node_id=args.target)
         
         console.print("\n[bold green]Compilation Successful![/bold green]")
+        
+        # Phase 4: IaC Compilation
+        from src.compiler.generator import IaCCompiler
+        compiler = IaCCompiler(build_dir="build")
+        compiler.compile(valid_topology)
+        
         console.print(Panel(
             valid_topology.model_dump_json(indent=2),
             title="Verified JSON Topology",
             border_style="green"
         ))
+        
+        console.print("[bold yellow]Infrastructure Code Generated in ./build/[/bold yellow]")
+        console.print("- Vagrantfile")
+        console.print("- site.yml")
+        console.print("- inventory.ini")
         
     except Exception as e:
         console.print(f"\n[bold red]Compilation Failed:[/bold red] {str(e)}")

@@ -49,11 +49,16 @@
 - [x] Implement the CEGIS loop: if Z3 says UNSAT, ask LLM to fix it (`src/generator/cegis.py`)
 - [x] Build the Rich CLI to tie the Neural and Symbolic layers together (`src/main.py`)
 
-#### Next Up: Phase 4 — IaC Compilation (Terraform/Vagrant)
-- [ ] Write `src/compiler/terraform.py` to translate Topologies into `.tf` files
-- [ ] Pre-configure VM templates (using Ubuntu 20.04/22.04 base boxes)
-- [ ] Create Ansible playbooks/bash scripts to intentionally install the vulnerable software
-- [ ] Run end-to-end test on dummy topology
+#### Phase 4: IaC Compilation (Vagrant/Ansible)
+- [x] Write `src/compiler/generator.py` to translate Topologies into `Vagrantfile` and `site.yml`
+- [x] Ensure IP assignment scheme works correctly based on Z3 node IDs
+- [x] Create Ansible playbooks structure targeting the vulnerable VMs
+- [x] Run end-to-end unit test to verify generated IaC code
+
+#### Next Up: Phase 5 — Visualizing the Cyber Range
+- [ ] Add `networkx` and `pyvis` to `requirements.txt`
+- [ ] Build `src/visualization/graph.py` to plot the generated Topology
+- [ ] Export the graph as an interactive HTML file
 
 ---
 
