@@ -17,6 +17,16 @@ Instead of relying purely on the probabilistic output of Large Language Models (
 
 ---
 
+## Deep Dive & Academic References
+For a complete technical breakdown of the compiler's Datalog layers and CEGIS feedback loop, read the [Architecture Deep Dive](docs/ARCHITECTURE.md).
+
+This project adapts state-of-the-art research in automated security modeling and neuro-symbolic verification:
+1. **Automated Vulnerability Modeling:** Adapts the Datalog approach from *"A scalable approach to attack graph generation (MulVAL)"* (Ou, Boyer, McQueen).
+2. **Neuro-Symbolic Agentic Oversight:** Inspired by *"FormalJudge: A Neuro-Symbolic Paradigm for Agentic Oversight"* (ICML 2026), replacing standard LLM evaluation with deterministic Dafny/Z3 verification.
+3. **Formal Proof Verification:** Implements self-correction paradigms analogous to *"ProofNet++: A Neuro-Symbolic System for Formal Proof Verification"*.
+
+---
+
 ## Visualization Dashboard
 Forge-Z3 operates primarily as a CLI Compiler with rich terminal output. 
 
