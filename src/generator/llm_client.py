@@ -24,20 +24,30 @@ class LLMGenerator:
         self.topology_schema = Topology.model_json_schema()
         self.cve_db = list(get_cve_map().keys())
 
-        self.system_prompt = f"""
-        You are an expert Cyber Range Infrastructure architect.
-        Your job is to design a network topology that satisfies the user's attack path requirements.
+        self.system_prompt = """
+        You are a strict JSON formatter. Your ONLY job is to convert the user's explicit architectural plan into a JSON object.
+        
+        The output MUST be a single JSON object with exactly three arrays: "nodes", "edges", and "vulnerabilities".
+        
+        EXAMPLE OUTPUT FORMAT:
+        {
+          "nodes": [
+            {"node_id": 0, "name": "Attacker"},
+            {"node_id": 1, "name": "WebServer"}
+          ],
+          "edges": [
+            {"source_id": 0, "target_id": 1, "port": 8080}
+          ],
+          "vulnerabilities": [
+            {"node_id": 1, "cve_id": "CVE-2021-44228"}
+          ]
+        }
         
         CRITICAL RULES:
-        1. Node 0 MUST ALWAYS be the Attacker.
-        2. You must output valid JSON exactly matching this schema:
-        {json.dumps(self.topology_schema, indent=2)}
-        
-        3. You may ONLY use the following CVE IDs for vulnerabilities:
-        {json.dumps(self.cve_db, indent=2)}
-        
-        4. If a CVE requires NETWORK_ACCESS, ensure there is an Edge routing the Attacker to the target's specific Port.
-        5. DO NOT output any markdown, markdown code blocks, or text outside the JSON object.
+        1. DO NOT output JSON schema definitions like $defs or $ref. Just output the raw data arrays.
+        2. Node 0 MUST ALWAYS be the Attacker.
+        3. Map the user's exact plan into this JSON format.
+        4. DO NOT output any markdown, markdown code blocks, or text outside the JSON object.
         """
 
     def upgrade_prompt(self, basic_prompt: str) -> str:
