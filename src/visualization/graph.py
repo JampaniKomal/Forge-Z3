@@ -18,7 +18,7 @@ class TopologyVisualizer:
 
     def generate_html(self, topology: Topology, filename: str = "topology.html"):
         """Generates an interactive HTML network graph."""
-        net = Network(height="750px", width="100%", bgcolor="#222222", font_color="white", directed=True)
+        net = Network(height="800px", width="100%", bgcolor="#050510", font_color="#e0e0e0", directed=True)
 
         # Build node vulnerability lookup
         vuln_map = {}
@@ -30,19 +30,36 @@ class TopologyVisualizer:
         # Add Nodes
         for node in topology.nodes:
             title = f"Node {node.node_id}: {node.name}"
-            if node.node_id in vuln_map:
-                title += f"\nVulnerabilities: {', '.join(vuln_map[node.node_id])}"
+            label_text = node.name
 
-            # Styling: Attacker is Red and large, Targets are Blue
-            color = "#ff4b4b" if node.node_id == 0 else "#4b8bff"
-            size = 30 if node.node_id == 0 else 20
+            if node.node_id in vuln_map:
+                cves = ', '.join(vuln_map[node.node_id])
+                title += f"\nVulnerabilities: {cves}"
+                label_text += f"\n🚨 {cves}" # Show CVE directly on the graph!
+
+            # Styling: Cyberpunk Aesthetics
+            if node.node_id == 0:
+                # Attacker Node (Neon Red)
+                node_color = {"background": "#ff003c", "border": "#8a0020", "highlight": {"background": "#ff3366", "border": "#ffffff"}}
+                shadow = {"enabled": True, "color": "#ff003c", "size": 25, "x": 0, "y": 0}
+                shape = "dot"
+                size = 35
+            else:
+                # Target Node (Neon Cyan)
+                node_color = {"background": "#00f0ff", "border": "#008a93", "highlight": {"background": "#33f3ff", "border": "#ffffff"}}
+                shadow = {"enabled": True, "color": "#00f0ff", "size": 20, "x": 0, "y": 0}
+                shape = "hexagon" if node.node_id in vuln_map else "dot"
+                size = 25
 
             net.add_node(
                 node.node_id,
-                label=node.name,
+                label=label_text,
                 title=title,
-                color=color,
-                size=size
+                color=node_color,
+                size=size,
+                shape=shape,
+                shadow=shadow,
+                font={"color": "#ffffff", "face": "Courier New", "size": 16, "bold": True}
             )
 
         # Add Edges
@@ -51,12 +68,27 @@ class TopologyVisualizer:
                 edge.source_id,
                 edge.target_id,
                 title=f"Port: {edge.port}",
-                label=str(edge.port),
-                color="#aaaaaa"
+                label=f" Port: {edge.port} ",
+                color={"color": "#4b5563", "highlight": "#00ffcc"},
+                width=3,
+                font={"color": "#a1a1aa", "face": "Courier New", "size": 12, "background": "#050510"}
             )
 
         # Configure physics for a beautiful spread-out layout
-        net.barnes_hut(spring_length=200, spring_strength=0.05)
+        net.set_options("""
+        var options = {
+          "physics": {
+            "barnesHut": {
+              "gravitationalConstant": -4000,
+              "centralGravity": 0.3,
+              "springLength": 250,
+              "springConstant": 0.04,
+              "damping": 0.09
+            },
+            "minVelocity": 0.75
+          }
+        }
+        """)
 
         output_path = os.path.join(self.build_dir, filename)
         net.write_html(output_path)
