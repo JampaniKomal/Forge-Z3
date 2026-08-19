@@ -25,14 +25,22 @@ class CEGISLoop:
         Loops until Z3 returns SAT, or max_iterations is reached.
         """
         previous_failures = []
+        
+        # --- TIER 1: Prompt Upgrade ---
+        with console.status("[magenta]Tier 1: Upgrading User Prompt...[/magenta]"):
+            upgraded_prompt = self.generator.upgrade_prompt(user_prompt)
+            
+        console.print("\n[bold magenta]=== TIER 1: ARCHITECTURAL PLAN ===[/bold magenta]")
+        console.print(f"[magenta]{upgraded_prompt}[/magenta]")
+        console.print("[bold magenta]=====================================[/bold magenta]\n")
 
         for iteration in range(1, self.max_iterations + 1):
             console.print(f"\n[bold cyan]CEGIS Iteration {iteration}/{self.max_iterations}[/bold cyan]")
 
             try:
-                # 1. SYNTHESIS (Neural)
-                with console.status("[yellow]LLM generating topology...[/yellow]"):
-                    topology = self.generator.generate_topology(user_prompt, previous_failures)
+                # 2. SYNTHESIS (Neural - Tier 2)
+                with console.status("[yellow]LLM generating topology (Tier 2)...[/yellow]"):
+                    topology = self.generator.generate_topology(upgraded_prompt, previous_failures)
                 console.print("  [green][OK] LLM generated a schema-compliant topology.[/green]")
 
                 # 2. VERIFICATION (Symbolic)

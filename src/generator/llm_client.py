@@ -40,6 +40,35 @@ class LLMGenerator:
         5. DO NOT output any markdown, markdown code blocks, or text outside the JSON object.
         """
 
+    def upgrade_prompt(self, basic_prompt: str) -> str:
+        """
+        Tier 1: Chain of Thought Reasoning.
+        Uses the LLM to map out the explicit physical connections in plain text,
+        so Tier 2 doesn't have to think about spatial reasoning.
+        """
+        upgrade_system_prompt = f"""
+        You are a Cyber Range Architect. Your job is to translate a user's basic request into a highly explicit, strict mapping.
+        
+        Available CVEs: {json.dumps(self.cve_db)}
+        
+        Rules for the mapping you must output:
+        1. Explicitly list the Nodes. Node 0 MUST be the Attacker. Node 1 is usually the Target.
+        2. Explicitly list the Edges. An Edge MUST connect the Attacker to the Target on the correct port if a network vulnerability is used.
+        3. Explicitly list the Vulnerabilities, mapping them to the EXACT CVE ID from the list above, and assign it to the Target's Node ID.
+        
+        Output only the explicit mapping in plain text. Do not output JSON.
+        """
+        messages = [
+            {"role": "system", "content": upgrade_system_prompt},
+            {"role": "user", "content": f"Basic Request: {basic_prompt}\n\nProvide the explicit mapping."}
+        ]
+        
+        response = litellm.completion(
+            model=self.model_name,
+            messages=messages
+        )
+        return response.choices[0].message.content.strip()
+
     def generate_topology(self, user_prompt: str, previous_failures: list[str] | None = None) -> Topology:
         messages = [
             {"role": "system", "content": self.system_prompt},
@@ -72,4 +101,4 @@ class LLMGenerator:
             data = json.loads(raw_json)
             return Topology(**data)
         except (json.JSONDecodeError, ValidationError) as e:
-            raise ValueError(f"LLM produced invalid JSON schema: {str(e)}")
+            raise ValueError(f"LLM produced invalid JSON schema: {str(e)}\n\n--- RAW OUTPUT FROM LLM ---\n{raw_json}\n---------------------------")
