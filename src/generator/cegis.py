@@ -53,6 +53,7 @@ class CEGISLoop:
                     return topology
                 else:
                     console.print("  [bold red][FAIL] Z3 FAILED (UNSAT): The attack path is broken.[/bold red]")
+                    console.print(f"\n--- RAW JSON TOPOLOGY ---\n{topology.model_dump_json(indent=2)}\n-------------------------\n")
                     failure_msg = (
                         "Z3 SMT Solver returned UNSAT. The attacker cannot reach the target "
                         "or lacks required privileges to execute the CVEs. Please double-check "
