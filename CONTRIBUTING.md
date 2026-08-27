@@ -7,7 +7,7 @@ Thank you for considering contributing to Forge-Z3! This document outlines the g
 1. Fork the repository.
 2. Clone your fork:
    ```bash
-   git clone https://github.com/<your-username>/Forge-Z3.git
+   git clone https://github.com/JampaniKomal/Forge-Z3
    cd Forge-Z3
    ```
 3. Create a virtual environment and install dependencies:
