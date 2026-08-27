@@ -11,7 +11,7 @@
 If you discover a security vulnerability in Forge-Z3, please report it responsibly:
 
 1. **Do NOT open a public GitHub issue.**
-2. Email the maintainer directly at: [jampanikomal@gmail.com] (replace with your actual email).
+2. Email the maintainer directly at: jampanikomal2005@gmail.com.
 3. Include a detailed description of the vulnerability, steps to reproduce, and potential impact.
 4. You will receive an acknowledgment within 48 hours.
 
