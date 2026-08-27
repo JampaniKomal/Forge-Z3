@@ -145,3 +145,150 @@ class Z3Engine:
         ))
 
         return q == z3.sat
+
+    def diagnose_failure(self, target_node_id: int) -> list[str]:
+        """
+        Analyse a failed topology WITHOUT Z3 and produce specific, actionable
+        error messages explaining exactly why the attack path is broken.
+
+        Returns a list of diagnostic strings.
+        """
+        diagnostics = []
+        topology = self.topology
+
+        # Build helper lookups
+        node_ids = {n.node_id for n in topology.nodes}
+        # incoming_edges[node_id] = list of (source_id, port)
+        incoming_edges: dict[int, list[tuple[int, int]]] = {nid: [] for nid in node_ids}
+        # outgoing_edges[node_id] = list of (target_id, port)
+        outgoing_edges: dict[int, list[tuple[int, int]]] = {nid: [] for nid in node_ids}
+        for edge in topology.edges:
+            if edge.target_id in incoming_edges:
+                incoming_edges[edge.target_id].append((edge.source_id, edge.port))
+            if edge.source_id in outgoing_edges:
+                outgoing_edges[edge.source_id].append((edge.target_id, edge.port))
+
+        # vulns_on_node[node_id] = list of cve_id strings
+        vulns_on_node: dict[int, list[str]] = {nid: [] for nid in node_ids}
+        for vuln in topology.vulnerabilities:
+            if vuln.node_id in vulns_on_node:
+                vulns_on_node[vuln.node_id].append(vuln.cve_id)
+
+        # --- Check 1: Target node exists ---
+        if target_node_id not in node_ids:
+            diagnostics.append(
+                f"Target node {target_node_id} does not exist in the topology. "
+                f"Available node IDs: {sorted(node_ids)}."
+            )
+            return diagnostics
+
+        # --- Check 2: No edge connects to the target ---
+        if not incoming_edges[target_node_id]:
+            diagnostics.append(
+                f"No edge connects TO Node {target_node_id}. "
+                f"Add an edge from a compromised node to Node {target_node_id}."
+            )
+
+        # --- Check 3: Port mismatch between edges and CVEs ---
+        for node_id in node_ids:
+            if node_id == 0:
+                continue  # Attacker node — no CVEs to check
+            for cve_id in vulns_on_node[node_id]:
+                if cve_id not in self.cve_map:
+                    diagnostics.append(
+                        f"Node {node_id} references unknown CVE '{cve_id}'. "
+                        f"It will be silently ignored. Use a valid CVE ID from the knowledge base."
+                    )
+                    continue
+
+                cve_def = self.cve_map[cve_id]
+
+                # Only check port for network-based exploits (not local PrivEsc)
+                if cve_def.pre_privilege == PrivilegeLevel.NETWORK_ACCESS:
+                    required_port = cve_def.port
+                    incoming_ports = [port for _, port in incoming_edges[node_id]]
+
+                    if required_port not in incoming_ports:
+                        if incoming_ports:
+                            diagnostics.append(
+                                f"Port mismatch on Node {node_id}: {cve_id} requires port "
+                                f"{required_port}, but incoming edges use port(s) "
+                                f"{incoming_ports}. Change the edge port to {required_port}."
+                            )
+                        else:
+                            diagnostics.append(
+                                f"Node {node_id} has {cve_id} (requires port {required_port}), "
+                                f"but no incoming edges exist to deliver network traffic."
+                            )
+
+        # --- Check 4: Missing privilege chain to ROOT ---
+        for node_id in node_ids:
+            if node_id == 0:
+                continue
+            cve_ids_on_node = vulns_on_node[node_id]
+            if not cve_ids_on_node:
+                continue
+
+            # What's the highest privilege achievable on this node?
+            max_post = PrivilegeLevel.NONE
+            has_local_privesc = False
+
+            for cve_id in cve_ids_on_node:
+                if cve_id not in self.cve_map:
+                    continue
+                cve_def = self.cve_map[cve_id]
+                # Track if there's a local escalation CVE
+                if cve_def.pre_privilege == PrivilegeLevel.USER:
+                    has_local_privesc = True
+                if cve_def.post_privilege == PrivilegeLevel.ROOT:
+                    max_post = PrivilegeLevel.ROOT
+                elif cve_def.post_privilege == PrivilegeLevel.USER and max_post != PrivilegeLevel.ROOT:
+                    max_post = PrivilegeLevel.USER
+
+            # If the node is the target and max achievable is only USER, warn
+            if node_id == target_node_id and max_post == PrivilegeLevel.USER and not has_local_privesc:
+                diagnostics.append(
+                    f"Node {node_id} (target) can only reach USER privilege via its CVEs "
+                    f"({cve_ids_on_node}), but ROOT is required. Add a local privilege "
+                    f"escalation CVE (e.g., CVE-2021-3156, CVE-2021-4034, or CVE-2016-5195)."
+                )
+
+        # --- Check 5: Unreachable intermediate nodes ---
+        # For multi-hop: intermediate nodes need both incoming AND outgoing edges
+        for node_id in node_ids:
+            if node_id == 0 or node_id == target_node_id:
+                continue
+            has_incoming = bool(incoming_edges[node_id])
+            has_outgoing = bool(outgoing_edges[node_id])
+
+            if has_incoming and not has_outgoing:
+                diagnostics.append(
+                    f"Node {node_id} is a dead-end: it has incoming edges but no outgoing "
+                    f"edges. If it's an intermediate hop, add an edge from Node {node_id} "
+                    f"to the next node in the attack chain."
+                )
+            elif not has_incoming and has_outgoing and node_id != 0:
+                diagnostics.append(
+                    f"Node {node_id} has outgoing edges but no incoming edges. "
+                    f"The attacker cannot reach it."
+                )
+
+        # --- Check 6: No vulnerabilities at all on a node that needs them ---
+        for node_id in node_ids:
+            if node_id == 0:
+                continue
+            if incoming_edges[node_id] and not vulns_on_node[node_id]:
+                diagnostics.append(
+                    f"Node {node_id} has incoming edges but no vulnerabilities assigned. "
+                    f"Without a CVE, the attacker cannot compromise this node even if "
+                    f"they can reach it."
+                )
+
+        if not diagnostics:
+            diagnostics.append(
+                "No obvious structural issue detected. The attack chain may have "
+                "a subtle logical gap in privilege transitions."
+            )
+
+        return diagnostics
+

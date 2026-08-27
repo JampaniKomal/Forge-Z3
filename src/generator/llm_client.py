@@ -24,30 +24,47 @@ class LLMGenerator:
         self.topology_schema = Topology.model_json_schema()
         self.cve_db = list(get_cve_map().keys())
 
-        self.system_prompt = """
+        # Build detailed CVE reference for Tier 2
+        cve_details = get_cve_map()
+        cve_reference_lines = []
+        for cve_id, cve_def in cve_details.items():
+            cve_reference_lines.append(
+                f"  - {cve_id}: port={cve_def.port}, "
+                f"pre={cve_def.pre_privilege.value} → post={cve_def.post_privilege.value}, "
+                f"type={cve_def.exploit_type.value}"
+            )
+        cve_reference = "\n".join(cve_reference_lines)
+
+        self.system_prompt = f"""
         You are a strict JSON formatter. Your ONLY job is to convert the user's explicit architectural plan into a JSON object.
         
         The output MUST be a single JSON object with exactly three arrays: "nodes", "edges", and "vulnerabilities".
         
+        VALID CVE DATABASE — you may ONLY use these exact CVE IDs:
+{cve_reference}
+        
         EXAMPLE OUTPUT FORMAT:
-        {
+        {{
           "nodes": [
-            {"node_id": 0, "name": "Attacker"},
-            {"node_id": 1, "name": "WebServer"}
+            {{"node_id": 0, "name": "Attacker"}},
+            {{"node_id": 1, "name": "WebServer"}}
           ],
           "edges": [
-            {"source_id": 0, "target_id": 1, "port": 8080}
+            {{"source_id": 0, "target_id": 1, "port": 8080}}
           ],
           "vulnerabilities": [
-            {"node_id": 1, "cve_id": "CVE-2021-44228"}
+            {{"node_id": 1, "cve_id": "CVE-2021-44228"}}
           ]
-        }
+        }}
         
         CRITICAL RULES:
-        1. DO NOT output JSON schema definitions like $defs or $ref. Just output the raw data arrays.
-        2. Node 0 MUST ALWAYS be the Attacker.
-        3. Map the user's exact plan into this JSON format.
-        4. DO NOT output any markdown, markdown code blocks, or text outside the JSON object.
+        1. ONLY use CVE IDs from the list above. Any other CVE ID will be silently ignored by the verifier.
+        2. Each CVE has a required port — the edge connecting to that node MUST use that exact port.
+        3. If a CVE only gives USER privilege, you MUST also add a local privilege escalation CVE (port=0, pre=USER→post=ROOT) on that same node to achieve ROOT.
+        4. Node 0 MUST ALWAYS be the Attacker.
+        5. Map the user's exact plan into this JSON format.
+        6. DO NOT output JSON schema definitions like $defs or $ref. Just output the raw data arrays.
+        7. DO NOT output any markdown, markdown code blocks, or text outside the JSON object.
         """
 
     def upgrade_prompt(self, basic_prompt: str) -> str:
@@ -92,7 +109,6 @@ class LLMGenerator:
             error_msg += "Please fix these logical/physical errors in your next JSON output."
             messages.append({"role": "user", "content": error_msg})
 
-        import os
         response = litellm.completion(
             model=self.model_name,
             messages=messages,
