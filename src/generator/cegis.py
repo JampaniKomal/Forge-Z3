@@ -14,6 +14,7 @@ from src.z3_engine.schema import Topology
 
 console = Console()
 
+
 class CEGISLoop:
     def __init__(self, model_name: str = "gemini/gemini-2.5-pro", max_iterations: int = 5):
         self.generator = LLMGenerator(model_name)
@@ -26,17 +27,19 @@ class CEGISLoop:
         If target_node_id is None, auto-detects the highest non-attacker node ID.
         """
         previous_failures = []
-        
+
         # --- TIER 1: Prompt Upgrade ---
         with console.status("[magenta]Tier 1: Upgrading User Prompt...[/magenta]"):
             upgraded_prompt = self.generator.upgrade_prompt(user_prompt)
-            
+
         console.print("\n[bold magenta]=== TIER 1: ARCHITECTURAL PLAN ===[/bold magenta]")
         console.print(f"[magenta]{upgraded_prompt}[/magenta]")
         console.print("[bold magenta]=====================================[/bold magenta]\n")
 
         for iteration in range(1, self.max_iterations + 1):
-            console.print(f"\n[bold cyan]CEGIS Iteration {iteration}/{self.max_iterations}[/bold cyan]")
+            console.print(
+                f"\n[bold cyan]CEGIS Iteration {iteration}/{self.max_iterations}[/bold cyan]"
+            )
 
             try:
                 # Step 1: SYNTHESIS (Neural - Tier 2)
@@ -59,18 +62,28 @@ class CEGISLoop:
                     is_sat = engine.verify_attack_path(effective_target)
 
                 if is_sat:
-                    console.print("  [bold green][OK] Z3 VERIFIED (SAT): The attack path is mathematically valid![/bold green]")
+                    console.print(
+                        "  [bold green][OK] Z3 VERIFIED (SAT): "
+                        "The attack path is mathematically valid![/bold green]"
+                    )
                     return topology
                 else:
                     # Generate specific failure diagnostics
                     diagnostics = engine.diagnose_failure(effective_target)
                     diagnostic_str = "\n".join(f"  • {d}" for d in diagnostics)
 
-                    console.print("  [bold red][FAIL] Z3 FAILED (UNSAT): The attack path is broken.[/bold red]")
-                    console.print(f"  [yellow]Diagnostics:[/yellow]")
+                    console.print(
+                        "  [bold red][FAIL] Z3 FAILED (UNSAT): "
+                        "The attack path is broken.[/bold red]"
+                    )
+                    console.print("  [yellow]Diagnostics:[/yellow]")
                     for d in diagnostics:
                         console.print(f"    [yellow]• {d}[/yellow]")
-                    console.print(f"\n--- RAW JSON TOPOLOGY ---\n{topology.model_dump_json(indent=2)}\n-------------------------\n")
+                    console.print(
+                        f"\n--- RAW JSON TOPOLOGY ---\n"
+                        f"{topology.model_dump_json(indent=2)}\n"
+                        f"-------------------------\n"
+                    )
 
                     # Send specific feedback to the LLM (not generic)
                     failure_msg = (

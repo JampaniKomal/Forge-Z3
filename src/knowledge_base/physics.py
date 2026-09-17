@@ -12,8 +12,8 @@ Basic rules:
 2. Network connectivity allows the attacker to reach a target node's port:
    Reaches(Attacker, Target, Port) :- Connected(Attacker, Target), RunsService(Target, Port).
 3. Exploitation transitions state based on the CVE pre/post privileges:
-   State(Target, ROOT) :- 
-        Reaches(Attacker, Target, Port), 
+   State(Target, ROOT) :-
+        Reaches(Attacker, Target, Port),
         RunsCVE(Target, Port, "CVE-2021-44228").
 """
 

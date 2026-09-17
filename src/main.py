@@ -15,11 +15,24 @@ from src.generator.cegis import CEGISLoop
 load_dotenv()
 console = Console()
 
+
 def main():
     parser = argparse.ArgumentParser(description="Forge-Z3: AI-Driven Cyber Range Compiler")
-    parser.add_argument("prompt", type=str, help="The natural language description of the attack path you want.")
-    parser.add_argument("--model", type=str, default="gemini/gemini-flash-latest", help="The LiteLLM model string to use.")
-    parser.add_argument("--target", type=int, default=None, help="The Node ID of the final target (auto-detected if not specified).")
+    parser.add_argument(
+        "prompt", type=str, help="The natural language description of the attack path you want."
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="gemini/gemini-flash-latest",
+        help="The LiteLLM model string to use.",
+    )
+    parser.add_argument(
+        "--target",
+        type=int,
+        default=None,
+        help="The Node ID of the final target (auto-detected if not specified).",
+    )
 
     args = parser.parse_args()
 

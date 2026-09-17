@@ -125,7 +125,9 @@ if __name__ == "__main__":
     console.print("\n[bold]Test 2:[/bold] Attacker -> WebServer  X  Database (no edge)")
     unsat_result = run_z3_unsat_demo()
     if unsat_result:
-        console.print("  [bold green]>> Z3 says: UNSAT (Attack path is BLOCKED -- correct!)[/bold green]")
+        console.print(
+            "  [bold green]>> Z3 says: UNSAT (Attack path is BLOCKED -- correct!)[/bold green]"
+        )
     else:
         console.print("  [bold red]>> Z3 says: SAT (UNEXPECTED -- something is wrong)[/bold red]")
 

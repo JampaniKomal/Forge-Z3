@@ -1,7 +1,7 @@
 """
 Tests for the Z3 hello world verification script.
 """
-from src.z3_hello_world import run_z3_hello_world, run_z3_unsat_demo
+from examples.z3_hello_world import run_z3_hello_world, run_z3_unsat_demo
 
 
 def test_z3_reachable_path():

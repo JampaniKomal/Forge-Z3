@@ -70,7 +70,8 @@ class IaCCompiler:
 
             # Group nodes by their name (e.g., [webserver])
             lines.append(f"[{machine_name}]")
-            lines.append(f"{ip_addr} ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/{machine_name}/virtualbox/private_key")
+            key_path = f".vagrant/machines/{machine_name}/virtualbox/private_key"
+            lines.append(f"{ip_addr} ansible_user=vagrant ansible_ssh_private_key_file={key_path}")
             lines.append("")
 
         with open(os.path.join(self.build_dir, "inventory.ini"), "w") as f:

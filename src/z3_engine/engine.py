@@ -242,11 +242,19 @@ class Z3Engine:
                     has_local_privesc = True
                 if cve_def.post_privilege == PrivilegeLevel.ROOT:
                     max_post = PrivilegeLevel.ROOT
-                elif cve_def.post_privilege == PrivilegeLevel.USER and max_post != PrivilegeLevel.ROOT:
+                elif (
+                    cve_def.post_privilege == PrivilegeLevel.USER
+                    and max_post != PrivilegeLevel.ROOT
+                ):
                     max_post = PrivilegeLevel.USER
 
             # If the node is the target and max achievable is only USER, warn
-            if node_id == target_node_id and max_post == PrivilegeLevel.USER and not has_local_privesc:
+            is_target_capped_at_user = (
+                node_id == target_node_id
+                and max_post == PrivilegeLevel.USER
+                and not has_local_privesc
+            )
+            if is_target_capped_at_user:
                 diagnostics.append(
                     f"Node {node_id} (target) can only reach USER privilege via its CVEs "
                     f"({cve_ids_on_node}), but ROOT is required. Add a local privilege "

@@ -18,7 +18,9 @@ def test_cegis_loop_success(mocker):
     )
 
     # Mock the LLM to return the valid topology
-    mocker.patch("src.generator.cegis.LLMGenerator.upgrade_prompt", return_value="Mocked Tier 1 output")
+    mocker.patch(
+        "src.generator.cegis.LLMGenerator.upgrade_prompt", return_value="Mocked Tier 1 output"
+    )
     mocker.patch("src.generator.cegis.LLMGenerator.generate_topology", return_value=valid_topology)
 
     loop = CEGISLoop(model_name="mock-model")
@@ -26,9 +28,10 @@ def test_cegis_loop_success(mocker):
 
     assert result == valid_topology
 
+
 def test_cegis_loop_max_iterations(mocker):
     """
-    Test that the CEGIS loop exhaust its iterations if the LLM 
+    Test that the CEGIS loop exhaust its iterations if the LLM
     keeps generating invalid/UNSAT topologies.
     """
     # Create an invalid topology (missing the edge)
@@ -38,8 +41,12 @@ def test_cegis_loop_max_iterations(mocker):
         vulnerabilities=[VulnerabilityInstance(node_id=1, cve_id="CVE-2021-44228")]
     )
 
-    mocker.patch("src.generator.cegis.LLMGenerator.upgrade_prompt", return_value="Mocked Tier 1 output")
-    mocker.patch("src.generator.cegis.LLMGenerator.generate_topology", return_value=invalid_topology)
+    mocker.patch(
+        "src.generator.cegis.LLMGenerator.upgrade_prompt", return_value="Mocked Tier 1 output"
+    )
+    mocker.patch(
+        "src.generator.cegis.LLMGenerator.generate_topology", return_value=invalid_topology
+    )
 
     loop = CEGISLoop(model_name="mock-model", max_iterations=2)
 

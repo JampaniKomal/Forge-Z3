@@ -18,7 +18,9 @@ class TopologyVisualizer:
 
     def generate_html(self, topology: Topology, filename: str = "topology.html"):
         """Generates an interactive HTML network graph."""
-        net = Network(height="800px", width="100%", bgcolor="#050510", font_color="#e0e0e0", directed=True)
+        net = Network(
+            height="800px", width="100%", bgcolor="#050510", font_color="#e0e0e0", directed=True
+        )
 
         # Build node vulnerability lookup
         vuln_map = {}
@@ -35,18 +37,26 @@ class TopologyVisualizer:
             if node.node_id in vuln_map:
                 cves = ', '.join(vuln_map[node.node_id])
                 title += f"\nVulnerabilities: {cves}"
-                label_text += f"\n🚨 {cves}" # Show CVE directly on the graph!
+                label_text += f"\n[!] {cves}"  # Show CVE directly on the graph
 
             # Styling: Cyberpunk Aesthetics
             if node.node_id == 0:
                 # Attacker Node (Neon Red)
-                node_color = {"background": "#ff003c", "border": "#8a0020", "highlight": {"background": "#ff3366", "border": "#ffffff"}}
+                node_color = {
+                    "background": "#ff003c",
+                    "border": "#8a0020",
+                    "highlight": {"background": "#ff3366", "border": "#ffffff"},
+                }
                 shadow = {"enabled": True, "color": "#ff003c", "size": 25, "x": 0, "y": 0}
                 shape = "dot"
                 size = 35
             else:
                 # Target Node (Neon Cyan)
-                node_color = {"background": "#00f0ff", "border": "#008a93", "highlight": {"background": "#33f3ff", "border": "#ffffff"}}
+                node_color = {
+                    "background": "#00f0ff",
+                    "border": "#008a93",
+                    "highlight": {"background": "#33f3ff", "border": "#ffffff"},
+                }
                 shadow = {"enabled": True, "color": "#00f0ff", "size": 20, "x": 0, "y": 0}
                 shape = "hexagon" if node.node_id in vuln_map else "dot"
                 size = 25
@@ -71,7 +81,12 @@ class TopologyVisualizer:
                 label=f" Port: {edge.port} ",
                 color={"color": "#4b5563", "highlight": "#00ffcc"},
                 width=3,
-                font={"color": "#a1a1aa", "face": "Courier New", "size": 12, "background": "#050510"}
+                font={
+                    "color": "#a1a1aa",
+                    "face": "Courier New",
+                    "size": 12,
+                    "background": "#050510",
+                },
             )
 
         # Configure physics for a beautiful spread-out layout
