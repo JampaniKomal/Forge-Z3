@@ -1,7 +1,7 @@
 # Forge-Z3: Implementation Log — Phase A, B & Tier 3 Design
 
 *Session Date: 2026-08-27 | Started: 11:54 IST | Ended: 12:14 IST*
-*Author: Antigravity AI + Jampani Komal*
+*Author: Jampani Komal*
 
 This document is a complete chronological record of everything discussed, analysed, implemented, tested, discovered, and planned during this session.
 
@@ -11,9 +11,9 @@ This document is a complete chronological record of everything discussed, analys
 
 1. [Full Session Timeline](#1-full-session-timeline)
 2. [Pre-Implementation: Full Codebase Deep-Dive](#2-pre-implementation-full-codebase-deep-dive)
-3. [Phase A: Critical Bug Fixes (Implemented ✅)](#3-phase-a-critical-bug-fixes-implemented-)
-4. [Phase B: Real CEGIS Feedback Loop (Implemented ✅)](#4-phase-b-real-cegis-feedback-loop-implemented-)
-5. [Test Results (11/11 Passed ✅)](#5-test-results-1111-passed-)
+3. [Phase A: Critical Bug Fixes (Implemented)](#3-phase-a-critical-bug-fixes-implemented)
+4. [Phase B: Real CEGIS Feedback Loop (Implemented)](#4-phase-b-real-cegis-feedback-loop-implemented)
+5. [Test Results (11/11 Passed)](#5-test-results-1111-passed)
 6. [Live Run with ollama/llama3:8b — What Happened](#6-live-run-with-ollamallama38b--what-happened)
 7. [Root Cause Analysis: Why llama3:8b Still Failed](#7-root-cause-analysis-why-llama38b-still-failed)
 8. [The Solution: Tier 3 Deterministic Auto-Repair (TODO)](#8-the-solution-tier-3-deterministic-auto-repair-todo)
@@ -36,7 +36,7 @@ This document is a complete chronological record of everything discussed, analys
 | 11:58–11:59 | **B1 implemented:** `diagnose_failure()` method added to `engine.py` (147 new lines). |
 | 11:59 | **A1 + A4 + B2 implemented:** Auto-detect in CEGIS, comment fix, specific feedback loop in `cegis.py`. |
 | 11:59 | Final file review of all modified files. |
-| 11:59–12:00 | Test suite executed: **11/11 tests passed** in 9.24 seconds. ✅ |
+| 11:59–12:00 | Test suite executed: **11/11 tests passed** in 9.24 seconds. |
 | 12:00 | Walkthrough and first version of this implementation log created. |
 | 12:01 | Git commit successful: `82e4c62 Fix Phase A & B: CEGIS loop and target auto-detection` |
 | 12:01 | Git push failed — network timeout to github.com (college network issue). |
@@ -90,7 +90,7 @@ Before writing a single line of code, every file in the repository was read and 
 
 ---
 
-## 3. Phase A: Critical Bug Fixes (Implemented ✅)
+## 3. Phase A: Critical Bug Fixes (Implemented)
 
 ### A1. Auto-Detect Target Node
 
@@ -170,7 +170,7 @@ CRITICAL RULES:
 
 ---
 
-## 4. Phase B: Real CEGIS Feedback Loop (Implemented ✅)
+## 4. Phase B: Real CEGIS Feedback Loop (Implemented)
 
 ### B1. Failure Diagnostics Engine
 
@@ -204,7 +204,7 @@ On UNSAT, the LLM now receives:
 
 ---
 
-## 5. Test Results (11/11 Passed ✅)
+## 5. Test Results (11/11 Passed)
 
 ```
 tests/test_cegis.py::test_cegis_loop_success PASSED                      [  9%]
@@ -243,8 +243,8 @@ The LLM correctly identified 3 nodes (Attacker, WebServer, Database) and the att
 | Iter | What LLM Generated | Diagnostic Output | What Went Wrong |
 |------|--------------------|--------------------|-----------------|
 | **1** | Edge 0→1 on port **80**, CVE-2017-5638 on Node 1, no CVEs on Node 2 | *"Port mismatch: CVE-2017-5638 requires 8080, edges use [80]"* + *"Node 2 has no vulnerabilities"* | Wrong port + forgot Node 2 |
-| **2** | Fixed port to **8080** ✅, added CVE-2021-3156 on **Node 1** (wrong node), still no CVEs on Node 2 | *"Node 2 has no vulnerabilities assigned"* | Put PrivEsc on wrong node |
-| **3** | Port 8080 ✅, moved CVE-2021-3156 to **Node 2** ✅, but no network CVE on Node 2 | *"No obvious structural issue"* (gap in our diagnostic) | Local PrivEsc without initial network access on Node 2 |
+| **2** | Fixed port to **8080** (correct), added CVE-2021-3156 on **Node 1** (wrong node), still no CVEs on Node 2 | *"Node 2 has no vulnerabilities assigned"* | Put PrivEsc on wrong node |
+| **3** | Port 8080 (correct), moved CVE-2021-3156 to **Node 2** (correct), but no network CVE on Node 2 | *"No obvious structural issue"* (gap in our diagnostic) | Local PrivEsc without initial network access on Node 2 |
 | **4** | Regressed — CVE-2021-3156 back on Node 1 | *"Node 2 has no vulnerabilities"* | Forgot Node 2 again |
 | **5** | Added CVE-2021-26855 (port **443**) on Node 2, but edge uses port **22** | *"Port mismatch: CVE-2021-26855 requires 443, edges use [22]"* | Port mismatch on Node 2 |
 
@@ -262,12 +262,12 @@ The LLM correctly identified 3 nodes (Attacker, WebServer, Database) and the att
 **This is NOT a failure of the CEGIS loop.** The loop is working correctly — it's detecting failures and providing specific feedback. The problem is that **the architecture asks the LLM to do too much**.
 
 ### What the LLM Must Currently Do (Too Much for 8B):
-1. ✅ Understand user intent → **Good at this**
-2. ✅ Pick a network structure (nodes + edges) → **Good at this**
-3. ⚠️ Choose valid CVE IDs from 12 options → **Gets it ~70% right**
-4. ❌ Match CVE ports to edge ports exactly → **Can't hold this in working memory**
-5. ❌ Build complete privilege chains (network CVE + local PrivEsc) → **Forgets pieces**
-6. ❌ Remember all constraints simultaneously → **Fixes one bug, introduces another**
+1. [OK] Understand user intent → **Good at this**
+2. [OK] Pick a network structure (nodes + edges) → **Good at this**
+3. [PARTIAL] Choose valid CVE IDs from 12 options → **Gets it ~70% right**
+4. [FAIL] Match CVE ports to edge ports exactly → **Can't hold this in working memory**
+5. [FAIL] Build complete privilege chains (network CVE + local PrivEsc) → **Forgets pieces**
+6. [FAIL] Remember all constraints simultaneously → **Fixes one bug, introduces another**
 
 ### The Core Insight
 
@@ -301,7 +301,7 @@ User Prompt
 For each CVE on a node, look up its required port in `cve_database.json`. If the incoming edge uses a different port, correct it automatically.
 ```
 Before: Edge(0→1, port=80),  Vuln(node=1, CVE-2017-5638)  # requires 8080
-After:  Edge(0→1, port=8080), Vuln(node=1, CVE-2017-5638)  ✅
+After:  Edge(0→1, port=8080), Vuln(node=1, CVE-2017-5638)  [fixed]
 ```
 
 **Fix 2 — Strip Unknown CVEs:**
@@ -330,9 +330,9 @@ If a non-attacker node has incoming edges but ZERO vulnerabilities, auto-assign 
 ### Why This Will Work for llama3:8b
 
 After Tier 3, the LLM only needs to:
-1. ✅ Understand user intent → Already good
-2. ✅ Pick a network structure → Already good
-3. ✅ Assign CVEs to roughly correct nodes → Already ~70% right
+1. [OK] Understand user intent → Already good
+2. [OK] Pick a network structure → Already good
+3. [OK] Assign CVEs to roughly correct nodes → Already ~70% right
 
 Everything else (ports, privilege chains, unknown CVEs) gets fixed by code. The CEGIS loop becomes a safety net for edge cases, not the primary correctness mechanism.
 
@@ -355,7 +355,7 @@ Compilation Successful!
 
 ## 9. Files Changed Summary
 
-### This Session (Implemented ✅)
+### This Session (Implemented)
 
 | File | Changes | Lines Added | Lines Removed |
 |------|---------|-------------|--------------|
@@ -368,7 +368,7 @@ Compilation Successful!
 
 ### Git Status
 
-- **Commit:** `82e4c62 Fix Phase A & B: CEGIS loop and target auto-detection` ✅
+- **Commit:** `82e4c62 Fix Phase A & B: CEGIS loop and target auto-detection` (done)
 - **Push:** Failed due to network timeout. **Must retry when network is available.**
 
 ### Next Session (TODO)

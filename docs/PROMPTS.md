@@ -6,7 +6,7 @@ When passing these prompts to the CLI, remember to enclose them in quotes and sp
 
 ---
 
-## 🟢 Easy (1-2 Nodes)
+## Easy (1-2 Nodes)
 These prompts are excellent for testing the pipeline, running live demonstrations, or utilizing smaller, highly-constrained local models (like 8B parameter Ollama instances) that might struggle with deep complexity.
 
 - **Direct Web Attack:** 
@@ -17,7 +17,7 @@ These prompts are excellent for testing the pipeline, running live demonstration
 
 ---
 
-## 🟡 Medium (3-4 Nodes)
+## Medium (3-4 Nodes)
 These prompts test the Z3 Engine's ability to verify lateral movement and simple pivoting. The LLM must correctly understand that the attacker cannot reach the final target without first compromising an intermediary node.
 
 - **The Standard Pivot (Recommended):**
@@ -28,7 +28,7 @@ These prompts test the Z3 Engine's ability to verify lateral movement and simple
 
 ---
 
-## 🔴 Hard (5+ Nodes with Strict Subnets)
+## Hard (5+ Nodes with Strict Subnets)
 These prompts heavily stress the Neuro-Symbolic CEGIS loop. They require the LLM to generate complex subnets and require the Z3 engine to rigorously verify physical network isolation and multi-stage exploitation preconditions.
 
 - **The DMZ Fortress:**

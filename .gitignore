@@ -24,5 +24,8 @@ Thumbs.db
 # Pytest
 .pytest_cache/
 
+# PyVis-generated local assets (copied into cwd when write_html runs outside build/)
+lib/
+
 # Environment variables
 .env

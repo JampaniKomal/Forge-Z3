@@ -4,7 +4,7 @@
 
 | Version | Supported |
 |---------|-----------|
-| main    | ✅        |
+| main    | Yes       |
 
 ## Reporting a Vulnerability
 
@@ -19,7 +19,7 @@ If you discover a security vulnerability in Forge-Z3, please report it responsib
 
 Forge-Z3 generates Infrastructure-as-Code (IaC) configurations that deploy intentionally vulnerable virtual machines. 
 
-### ⚠️ Important Warnings
+### Important Warnings
 
 - **Never deploy generated configurations on production networks.** Generated environments contain real, exploitable CVEs (e.g., Log4Shell, EternalBlue).
 - **Always run generated ranges in isolated, air-gapped environments** (e.g., host-only VirtualBox networks, isolated Docker bridge networks).

@@ -144,6 +144,10 @@ These are structural improvements that make the codebase robust and professional
 
 ---
 
+**Update (2026-09-17): Phase C is done.** All four items below were
+implemented and verified (16/16 tests pass, including 5 new tests added
+specifically for the C2-C4 validators in `tests/test_schema_validation.py`).
+
 ### C1. Add `__init__.py` to All Source Packages
 
 **The Problem:**
@@ -292,7 +296,7 @@ For each CVE in `cve_database.json`, create at least a skeleton role. Realistic 
 
 ---
 
-### D4. Fix Role Name Mismatch
+### D4. Fix Role Name Mismatch — DONE (2026-09-17)
 
 **The Problem:**
 The compiler generates role names like `cve_2021_44228` (from `generator.py` line 111), but the actual Ansible role directory is named `log4shell`. These do not match. Ansible will fail with "role not found."
@@ -301,9 +305,15 @@ The compiler generates role names like `cve_2021_44228` (from `generator.py` lin
 
 **Done Condition:** The role directory name matches exactly what `site.yml` references.
 
+**Verified:** ran a real end-to-end compilation (`ollama/qwen2.5-coder:3b`, Log4Shell
+scenario) and confirmed the generated `site.yml` references `cve_2021_44228`, which
+now matches `ansible/roles/cve_2021_44228/`. D1-D3 (real provisioning logic for the
+CVE roles) remain not started — the role content is still a placeholder `debug`
+message, not a working Log4j deployment.
+
 ---
 
-## Phase E: Repository Cleanup
+## Phase E: Repository Cleanup — DONE (2026-09-17)
 
 ---
 
@@ -311,17 +321,27 @@ The compiler generates role names like `cve_2021_44228` (from `generator.py` lin
 
 Remove `context/`, `devlog/`, `research/`. They contain nothing and make the repo look unfinished.
 
+**Status:** these directories did not exist in the repo by the time this was checked — already moot.
+
 ---
 
 ### E2. Handle the `lib/` Directory
 
 The `lib/` directory contains vendored JavaScript files (`vis-9.1.2/`, `tom-select/`, `bindings/`) that PyVis depends on. Either add `lib/` to `.gitignore` if it is auto-generated, or document it in REPOSITORY_MAP.md.
 
+**Status:** confirmed the committed `lib/` contents were byte-identical to PyVis's own
+bundled `templates/lib/` assets — i.e. build output from a previous `write_html()` run
+from the repo root, not original project code. Removed from git tracking and added
+`lib/` to `.gitignore`.
+
 ---
 
 ### E3. Move `z3_hello_world.py` Out of `src/`
 
 `z3_hello_world.py` is a Phase 0 verification script. It served its purpose. Move it to `examples/` or `scripts/` so it does not clutter the main source tree.
+
+**Status:** moved to `examples/z3_hello_world.py`, `tests/test_z3_hello_world.py` import
+updated to match, and the full test suite re-run to confirm nothing broke.
 
 ---
 
@@ -335,15 +355,20 @@ Verify that `.env` is in `.gitignore`. Currently there is a `.env` file (541 byt
 
 ---
 
-### F1. Add Test for Unknown CVE Handling
+### F1. Add Test for Unknown CVE Handling — DONE (2026-09-17)
 
 After implementing C2 (unknown CVE validation), add a test that verifies a fake CVE is rejected.
 
+**Status:** `tests/test_schema_validation.py::test_topology_rejects_unknown_cve`.
+
 ---
 
-### F2. Add Test for Referential Integrity
+### F2. Add Test for Referential Integrity — DONE (2026-09-17)
 
 After implementing C3, add a test that verifies invalid node references in edges are rejected.
+
+**Status:** `tests/test_schema_validation.py::test_topology_rejects_edge_to_unknown_node` and
+`test_topology_rejects_vulnerability_on_unknown_node`.
 
 ---
 
@@ -351,11 +376,18 @@ After implementing C3, add a test that verifies invalid node references in edges
 
 After implementing A1, add a test that verifies `target_node_id=None` auto-detects the correct target.
 
+**Status:** still not covered by an explicit unit test — auto-detection has only been
+verified via live runs (see README's Tested Configurations section), not a pytest case.
+
 ---
 
 ### F4. Add Test for Specific CEGIS Diagnostics
 
 After implementing B1, add a test that verifies the diagnostic function outputs correct, specific error messages for different failure modes.
+
+**Status:** still not covered by an explicit unit test for `diagnose_failure()` itself,
+though the diagnostics were observed working correctly in a live run (a real port
+mismatch was caught and reported, and the LLM corrected it on the next iteration).
 
 ---
 

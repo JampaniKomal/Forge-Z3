@@ -1,6 +1,6 @@
 # Forge-Z3: Full Codebase Audit, Live Run Analysis & Fix Plan
 
-*Written by Antigravity AI on 2026-08-27 after a full line-by-line audit of every file in the repository.*
+*Written 2026-08-27 after a full line-by-line audit of every file in the repository.*
 *This document captures: what the code does, what was run, exactly why it failed, and what must change to fix it.*
 
 ---
@@ -77,8 +77,8 @@ The core innovation is the **CEGIS (Counterexample-Guided Inductive Synthesis)**
   2. For up to `max_iterations`:
      - Runs Tier 2: `generate_topology()` — generates JSON.
      - Creates `Z3Engine` and calls `verify_attack_path(target_node_id)`.
-     - If `SAT` → returns the topology. ✅
-     - If `UNSAT` → **appends a GENERIC error string** to `previous_failures`. ❌
+     - If `SAT` → returns the topology.
+     - If `UNSAT` → **appends a GENERIC error string** to `previous_failures`.
   3. If all iterations exhausted → raises `RuntimeError`.
 - **BUG (Comment numbering):** Lines 41 and 46 both say `# 2.` (should be Step 1 and Step 2).
 - **BUG (Auto-target):** `target_node_id` is always passed from CLI default of `2`. A 2-node network only has node IDs 0 and 1 — querying node 2 always returns UNSAT.
@@ -266,7 +266,7 @@ RunsCVE(1, WEAK_SSH_CREDS_INT)     ← WebServer runs WEAK_SSH_CREDS
 
 **Reachability check — Attacker to WebServer:**
 ```
-State(0, ROOT) ✅ + NetworkEdge(0→1, 80) ✅ → Reaches(0, 1, port=80) ✅
+State(0, ROOT) + NetworkEdge(0→1, 80) → Reaches(0, 1, port=80)
 ```
 
 **Exploitation check — Can Attacker compromise WebServer?**
@@ -274,16 +274,16 @@ State(0, ROOT) ✅ + NetworkEdge(0→1, 80) ✅ → Reaches(0, 1, port=80) ✅
 The Datalog rule fires only if `Reaches(0, 1, port=22)` exists.
 We only have `Reaches(0, 1, port=80)`. **Port mismatch. Rule does not fire.**
 ```
-State(1, USER) ← NEVER DERIVED  ❌
+State(1, USER) ← NEVER DERIVED
 ```
 
 **Pivot check — Can WebServer reach Database?**
 Reachability rule requires `State(1, ROOT) or State(1, USER)`.
-Since Node 1 was never compromised: **`Reaches(1, 2, 22)` never fires.** ❌
+Since Node 1 was never compromised: **`Reaches(1, 2, 22)` never fires.**
 
 **Final query:**
 ```
-State(2, ROOT) ← NEVER DERIVED → Z3 returns UNSAT ❌
+State(2, ROOT) ← NEVER DERIVED → Z3 returns UNSAT
 ```
 
 ### 2.4 Root Cause of the Failure

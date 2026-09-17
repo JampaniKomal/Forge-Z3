@@ -21,9 +21,24 @@ If Z3 determines the attack path is logically impossible (`UNSAT`), it extracts 
 
 ### Layer 3: Infrastructure Deployment (The Compiler)
 Once verified by the math engine, the JSON topology is passed to the IaC Compiler.
-- The compiler translates the proven topology into an executable `Vagrantfile`.
-- It generates an Ansible `inventory.ini` and `site.yml` mapping the CVEs to specific configuration roles to automatically provision the vulnerable services upon boot.
-- It triggers a Python PyVis engine to render an interactive 3D HTML map of the network for the user.
+- The compiler translates the proven topology into a `Vagrantfile` and matching Ansible
+  `inventory.ini` / `site.yml`, with each vulnerable node mapped to a role named after its
+  CVE ID (e.g., `cve_2021_44228`).
+- It triggers a Python PyVis engine to render an interactive 3D HTML map of the network for
+  the user.
+
+**What this layer does and does not guarantee:** the role *names* generated here are
+verified to match real role directories under `ansible/`, and the compiler's output files
+have been checked to actually parse as valid Vagrant/Ansible syntax. What is **not**
+verified is that running `vagrant up` against the output actually boots working VMs with
+the claimed vulnerabilities — most role directories currently contain a placeholder task
+(a `debug` message) rather than real provisioning logic. See the README's Known
+Limitations section for exactly which CVEs have real roles versus stubs.
 
 ## Conclusion
-By wrapping a probabilistic neural network inside a deterministic mathematical theorem prover, Forge-Z3 guarantees that the cyber ranges it generates are 100% executable and mathematically sound before a single Virtual Machine is ever booted.
+By wrapping a probabilistic neural network inside a deterministic mathematical theorem
+prover, Forge-Z3 guarantees that the *attack path itself* — the sequence of network
+reachability and privilege-escalation steps — is mathematically sound before any
+infrastructure is generated. It does not yet guarantee that the generated infrastructure,
+once deployed, actually reproduces every claimed vulnerability; that depends on the
+Ansible roles being filled in with real provisioning logic (tracked in `ROADMAP.md`).
