@@ -102,10 +102,11 @@ Defines the Pydantic models the LLM must output:
 This is the intellectual heart of the project. It uses Z3's `Fixedpoint` (Datalog) engine.
 
 **Sorts (data types in Z3):**
-- `NodeSort`: 4-bit BitVec → up to 16 nodes
+- `NodeSort`: BitVec sized to the topology (>= 4 bits; widened so any `node_id`
+  fits — a fixed 4-bit sort used to wrap node IDs >= 16 onto the attacker)
 - `PrivSort`: 3-bit BitVec → up to 8 privilege levels
 - `PortSort`: 16-bit BitVec → up to 65535 ports
-- `CveSort`: 8-bit BitVec → up to 256 CVEs
+- `CveSort`: BitVec sized to the knowledge base (>= 8 bits)
 
 **Relations (Datalog predicates):**
 - `NetworkEdge(node1, node2, port)` → is there a network connection?

@@ -75,10 +75,20 @@ This section is updated from actual runs, not aspirations.
   succeeded on the second CEGIS iteration: the first attempt used the wrong
   port for CVE-2021-44228, Z3 caught it and told the model exactly what was
   wrong, and the model corrected it on retry.
-- The 11-test unit suite (`pytest tests/`) passes, including the Z3 SAT/UNSAT
-  logic, the CEGIS loop (mocked LLM), the compiler, and the visualizer.
+- The 22-test unit suite (`pytest tests/`) passes, including the Z3 SAT/UNSAT
+  logic, BitVec-sort sizing/soundness, failure diagnostics, the CEGIS loop
+  (mocked LLM), the compiler, and the visualizer.
 - `ruff` and `bandit` both report zero issues; `pip-audit` reports no known
-  vulnerabilities in the pinned dependencies.
+  vulnerabilities in the pinned dependencies. CI runs ruff + pytest on
+  Python 3.10, 3.11 and 3.12.
+
+**Correctness fix (latest pass):**
+- The Z3 node/CVE BitVec sorts were a fixed width (4-bit nodes), which silently
+  wrapped any `node_id >= 16` — node 16 aliased to the attacker at node 0, so a
+  query about an unreachable high-id node could collapse onto the attacker's own
+  ROOT fact and wrongly return SAT. The sort widths are now derived from the
+  topology, the topology schema rejects negative IDs and out-of-range ports, and
+  both cases are covered by regression tests (`tests/test_z3_engine_scaling.py`).
 
 **What is known to be inconsistent:**
 - Local model reliability varies by model and prompt, not just parameter
