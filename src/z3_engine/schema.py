@@ -11,22 +11,26 @@ from pydantic import BaseModel, Field, model_validator
 class Node(BaseModel):
     """A virtual machine in the cyber range."""
 
-    node_id: int = Field(..., description="Unique ID. Node 0 is ALWAYS the Attacker.")
+    # Non-negative: node IDs are encoded as unsigned Z3 BitVecs, so a negative
+    # ID would wrap to a different node.
+    node_id: int = Field(..., ge=0, description="Unique ID. Node 0 is ALWAYS the Attacker.")
     name: str = Field(..., description="Human-readable name (e.g., 'WebServer')")
 
 
 class Edge(BaseModel):
     """A network connection between two nodes."""
 
-    source_id: int = Field(..., description="The ID of the node initiating the connection")
-    target_id: int = Field(..., description="The ID of the node receiving the connection")
-    port: int = Field(..., description="The destination port (e.g., 80, 443, 22)")
+    source_id: int = Field(..., ge=0, description="The ID of the node initiating the connection")
+    target_id: int = Field(..., ge=0, description="The ID of the node receiving the connection")
+    port: int = Field(
+        ..., ge=0, le=65535, description="The destination port (e.g., 80, 443, 22)"
+    )
 
 
 class VulnerabilityInstance(BaseModel):
     """A vulnerability installed on a specific node."""
 
-    node_id: int = Field(..., description="The ID of the vulnerable node")
+    node_id: int = Field(..., ge=0, description="The ID of the vulnerable node")
     cve_id: str = Field(..., description="The exact CVE string from the knowledge base")
 
 

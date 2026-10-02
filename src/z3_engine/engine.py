@@ -27,11 +27,23 @@ class Z3Engine:
         self.fp = z3.Fixedpoint()
         self.fp.set("engine", "datalog")
 
+        # Size the node and CVE sorts to the actual data. A fixed 4-bit node
+        # sort silently wraps any node_id >= 16 (e.g. node 16 aliases to the
+        # attacker at node 0), which would make verification unsound for larger
+        # topologies, so the width is derived from the largest node_id present.
+        # Privilege (4 levels) and port (0-65535) sorts are genuinely bounded.
+        max_node_id = max((n.node_id for n in topology.nodes), default=0)
+        num_cves = len(self.cve_map)
+        self.node_bits = max(4, max_node_id.bit_length())
+        self.cve_bits = max(8, num_cves.bit_length())
+        self.PRIV_BITS = 3   # up to 8 privilege levels (4 used)
+        self.PORT_BITS = 16  # up to 65535 ports
+
         # Sorts (Types)
-        self.NodeSort = z3.BitVecSort(4)  # 4 bits = up to 16 nodes
-        self.PrivSort = z3.BitVecSort(3)  # 3 bits = up to 8 privilege levels
-        self.PortSort = z3.BitVecSort(16) # 16 bits = up to 65535 ports
-        self.CveSort = z3.BitVecSort(8)   # 8 bits = up to 256 CVEs
+        self.NodeSort = z3.BitVecSort(self.node_bits)
+        self.PrivSort = z3.BitVecSort(self.PRIV_BITS)
+        self.PortSort = z3.BitVecSort(self.PORT_BITS)
+        self.CveSort = z3.BitVecSort(self.cve_bits)
 
         # Predicates (Relations)
         self.NetworkEdge = z3.Function(
@@ -90,7 +102,7 @@ class Z3Engine:
                     self.State(n2, z3.BitVecVal(post_val, 3)),
                     [
                         self.Reaches(n1, n2, z3.BitVecVal(target_port, 16)),
-                        self.RunsCVE(n2, z3.BitVecVal(cve_int, 8))
+                        self.RunsCVE(n2, z3.BitVecVal(cve_int, self.cve_bits))
                     ]
                 )
             else:
@@ -99,7 +111,7 @@ class Z3Engine:
                     self.State(n2, z3.BitVecVal(post_val, 3)),
                     [
                         self.State(n2, z3.BitVecVal(pre_val, 3)),
-                        self.RunsCVE(n2, z3.BitVecVal(cve_int, 8))
+                        self.RunsCVE(n2, z3.BitVecVal(cve_int, self.cve_bits))
                     ]
                 )
 
@@ -110,15 +122,15 @@ class Z3Engine:
     def _assert_facts(self):
         """Assert the physical reality of the topology."""
         # The attacker is always Node 0 with ROOT on their own machine
-        attacker_node = z3.BitVecVal(0, 4)
+        attacker_node = z3.BitVecVal(0, self.node_bits)
         root_priv = z3.BitVecVal(PRIVILEGE_MAP[PrivilegeLevel.ROOT], 3)
         self.fp.fact(self.State(attacker_node, root_priv))
 
         # Edges
         for edge in self.topology.edges:
             self.fp.fact(self.NetworkEdge(
-                z3.BitVecVal(edge.source_id, 4),
-                z3.BitVecVal(edge.target_id, 4),
+                z3.BitVecVal(edge.source_id, self.node_bits),
+                z3.BitVecVal(edge.target_id, self.node_bits),
                 z3.BitVecVal(edge.port, 16)
             ))
 
@@ -127,8 +139,8 @@ class Z3Engine:
             if vuln.cve_id in self._cve_id_to_int:
                 cve_int = self._cve_id_to_int[vuln.cve_id]
                 self.fp.fact(self.RunsCVE(
-                    z3.BitVecVal(vuln.node_id, 4),
-                    z3.BitVecVal(cve_int, 8)
+                    z3.BitVecVal(vuln.node_id, self.node_bits),
+                    z3.BitVecVal(cve_int, self.cve_bits)
                 ))
 
     def verify_attack_path(self, target_node_id: int) -> bool:
@@ -140,7 +152,7 @@ class Z3Engine:
         self._assert_facts()
 
         q = self.fp.query(self.State(
-            z3.BitVecVal(target_node_id, 4),
+            z3.BitVecVal(target_node_id, self.node_bits),
             z3.BitVecVal(PRIVILEGE_MAP[PrivilegeLevel.ROOT], 3)
         ))
 
